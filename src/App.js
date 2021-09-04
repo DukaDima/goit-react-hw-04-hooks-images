@@ -1,25 +1,38 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import Searchbar from './components/Searchbar/Searchbar';
+import ImageGallery from './components/ImageGallery/ImageGallery';
+import Modal from './components/Modal/Modal';
+import { ToastContainer } from 'react-toastify';
+import PropTypes from 'prop-types';
 
-function App() {
+export default function App() {
+  const [searchPhoto, setSearchPhoto] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [modalPhoto, setModalPhoto] = useState('');
+
+  const handleFormSubmit = searchPhoto => {
+    setSearchPhoto(searchPhoto);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+  };
+  const handleClickPhoto = modalPhoto => {
+    setModalPhoto(modalPhoto);
+    setShowModal(true);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      {showModal && <Modal onClose={closeModal} largePhoto={modalPhoto} />}
+      <ToastContainer autoClose={3000} />
+      <Searchbar onSubmit={handleFormSubmit} />
+      <ImageGallery searchPhoto={searchPhoto} onClick={handleClickPhoto} />
+    </>
   );
 }
-
-export default App;
+App.propTypes = {
+  searchPhoto: PropTypes.string,
+  showModal: PropTypes.bool,
+  modalPhoto: PropTypes.string,
+};
