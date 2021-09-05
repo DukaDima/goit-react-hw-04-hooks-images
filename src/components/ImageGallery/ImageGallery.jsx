@@ -34,19 +34,25 @@ export default function ImageGallery({ searchPhoto, onClick }) {
       return;
     }
     setLoading(true);
-    fetch(
-      `${BASE_URL}?q=${searchPhoto}&page=${page}&key=${KEY}&image_type=photo&orientation=horizontal&per_page=12`,
-    )
-      .then(res => res.json())
-      .then(photos => setPhotos(oldPhotos => [...oldPhotos, ...photos.hits]))
-      .catch(error => setError(error))
-      .finally(() => {
-        setLoading(false);
-        window.scrollTo({
-          top: document.documentElement.scrollHeight,
-          behavior: 'smooth',
+    try {
+      new Error();
+      fetch(
+        `${BASE_URL}?q=${searchPhoto}&page=${page}&key=${KEY}&image_type=photo&orientation=horizontal&per_page=12`,
+      )
+        .then(res => res.json())
+        .then(photos => setPhotos(oldPhotos => [...oldPhotos, ...photos.hits]))
+        .catch(error => setError(error))
+        .finally(() => {
+          setLoading(false);
+          window.scrollTo({
+            top: document.documentElement.scrollHeight,
+            behavior: 'smooth',
+          });
         });
-      });
+    } catch (error) {
+      setError(error);
+      setLoading(false);
+    }
   }, [page]);
 
   const handleAddPage = () => {
