@@ -22,18 +22,24 @@ export default function ImageGallery({ searchPhoto, onClick }) {
       setPage(1);
       setPhotos([]);
       setLoading(true);
+      setError(null);
       try {
         await fetch(
           `${BASE_URL}?q=${searchPhoto}&page=1&key=${KEY}&image_type=photo&orientation=horizontal&per_page=12`,
         )
           .then(res => res.json())
-          .then(photos => setPhotos(photos.hits))
+          .then(photos => {
+            if (!photos.hits.length) {
+              throw new Error('oops');
+            } else {
+              setPhotos(photos.hits);
+            }
+          })
           .catch(error => {
-            throw new Error('oops');
+            setError(error);
           })
           .finally(() => setLoading(false));
       } catch (error) {
-        setError(error);
         setLoading(false);
       }
     })();
@@ -54,7 +60,7 @@ export default function ImageGallery({ searchPhoto, onClick }) {
             setPhotos(oldPhotos => [...oldPhotos, ...photos.hits]),
           )
           .catch(error => {
-            throw new Error('oops');
+            setError(error);
           })
           .finally(() => {
             setLoading(false);
@@ -78,9 +84,8 @@ export default function ImageGallery({ searchPhoto, onClick }) {
   };
   return (
     <div>
-      {error && <p>Ошибка запроса по слову {searchPhoto}</p>}
+      {error && <p>Ошибка запроса по слову "{searchPhoto}"</p>}
       {loading && <Spinner />}
-      {!photos && <p>Введите ключевое слово</p>}
       {photos && (
         <ul className="ImageGallery">
           {photos.map(hit => (
